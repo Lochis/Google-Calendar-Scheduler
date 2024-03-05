@@ -51,7 +51,7 @@ public class CalendarQuickstart {
    * If modifying these scopes, delete your previously saved tokens/ folder.
    */
   private static final List<String> SCOPES =
-      Arrays.asList(CalendarScopes.CALENDAR, CalendarScopes.CALENDAR_EVENTS);
+      Collections.singletonList(CalendarScopes.CALENDAR_EVENTS);
   private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
   /**
@@ -83,55 +83,94 @@ public class CalendarQuickstart {
     return credential;
   }
 
+
+
+    public static void main(String... args) throws IOException, GeneralSecurityException {
+
+        // Build a new authorized API client service.
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        Calendar service =
+            new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+
+            DateTime startDateTime = new DateTime(System.currentTimeMillis());
+            CreateFullDayEvent(service, "I am the name of this event", "Full", startDateTime);
+
+
+        // List the next 10 events from the primary calendar.
+        DateTime now = new DateTime(System.currentTimeMillis());
+        Events events = service.events().list("primary")
+            .setMaxResults(10)
+            .setTimeMin(now)
+            .setOrderBy("startTime")
+            .setSingleEvents(true)
+            .execute();
+        List<Event> items = events.getItems();
+        if (items.isEmpty()) {
+          System.out.println("No upcoming events found.");
+        } else {
+          System.out.println("Upcoming events");
+          for (Event event : items) {
+            DateTime start = event.getStart().getDateTime();
+            if (start == null) {
+              start = event.getStart().getDate();
+            }
+            System.out.printf("%s (%s)\n", event.getSummary(), start);
+          }
+        }
+    }
+
 // 1. Create a new event
 // Needs: Name, Type (AM, PM or Full day), Start date, End date, Type
 public static void CreateFullDayEvent(Calendar service, String Name, String type, DateTime startDateTime) throws IOException{
-  DateTime endDateTime = new DateTime (startDateTime.getValue() + 86400000);
-  if(type.equals("Full")){
-     endDateTime = new DateTime (startDateTime.getValue() + 86400000);
-  }else {
+    DateTime endDateTime = new DateTime (startDateTime.getValue() + 86400000);
+    if(type.equals("Full")){
+        endDateTime = new DateTime (startDateTime.getValue() + 86400000);
+    }else {
 
-  }
+    }
 
-  //endDate = new Date (startDate.getTime() + 86400000);
+    //endDate = new Date (startDate.getTime() + 86400000);
 
     Event event = new Event()
-    .setSummary("Test")
-    .setLocation("My HAWSE")
-    .setDescription("Testing out this event creation");
+        .setSummary("Test")
+        .setLocation("My HAWSE")
+        .setDescription("Testing out this event creation");
 
-EventDateTime start = new EventDateTime()
-    .setDateTime(startDateTime)
-    .setTimeZone("America/Los_Angeles");
-event.setStart(start);
+    EventDateTime start = new EventDateTime()
+        .setDateTime(startDateTime)
+        .setTimeZone("America/Los_Angeles");
+    event.setStart(start);
 
-//DateTime endDateTime = new DateTime("2024-02-13T17:00:00-07:00");
-EventDateTime end = new EventDateTime()
-    .setDateTime(endDateTime)
-    .setTimeZone("America/Los_Angeles");
-event.setEnd(end);
+    //DateTime endDateTime = new DateTime("2024-02-13T17:00:00-07:00");
+    EventDateTime end = new EventDateTime()
+        .setDateTime(endDateTime)
+        .setTimeZone("America/Los_Angeles");
+    event.setEnd(end);
 
-/*String[] recurrence = new String[] {"RRULE:FREQ=DAILY;COUNT=2"};
-event.setRecurrence(Arrays.asList(recurrence));
+    /*String[] recurrence = new String[] {"RRULE:FREQ=DAILY;COUNT=2"};
+      event.setRecurrence(Arrays.asList(recurrence));
 
-EventAttendee[] attendees = new EventAttendee[] {
-    new EventAttendee().setEmail("lpage@example.com"),
-    new EventAttendee().setEmail("sbrin@example.com"),
-};
-event.setAttendees(Arrays.asList(attendees));
+      EventAttendee[] attendees = new EventAttendee[] {
+      new EventAttendee().setEmail("lpage@example.com"),
+      new EventAttendee().setEmail("sbrin@example.com"),
+      };
+      event.setAttendees(Arrays.asList(attendees));
 
-EventReminder[] reminderOverrides = new EventReminder[] {
-    new EventReminder().setMethod("email").setMinutes(24 * 60),
-    new EventReminder().setMethod("popup").setMinutes(10),
-};
-Event.Reminders reminders = new Event.Reminders()
-    .setUseDefault(false)
-    .setOverrides(Arrays.asList(reminderOverrides));
-event.setReminders(reminders);
-*/
-String calendarId = "primary";
-event = service.events().insert(calendarId, event).execute();
-System.out.printf("Event created: %s\n", event.getHtmlLink());
+      EventReminder[] reminderOverrides = new EventReminder[] {
+      new EventReminder().setMethod("email").setMinutes(24 * 60),
+      new EventReminder().setMethod("popup").setMinutes(10),
+      };
+      Event.Reminders reminders = new Event.Reminders()
+      .setUseDefault(false)
+      .setOverrides(Arrays.asList(reminderOverrides));
+      event.setReminders(reminders);
+      */
+    String calendarId = "primary";
+    event = service.events().insert(calendarId, event).execute();
+    System.out.printf("Event created: %s\n", event.getHtmlLink());
+}
 }
 
 // 2. Delete an event
@@ -144,41 +183,3 @@ System.out.printf("Event created: %s\n", event.getHtmlLink());
 // Needs: Start date, End date
 
 
-
-  public static void main(String... args) throws IOException, GeneralSecurityException {
-
-    // Build a new authorized API client service.
-    final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-    Calendar service =
-        new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-            .setApplicationName(APPLICATION_NAME)
-            .build();
-
-            DateTime startDateTime = new DateTime("2024-02-13T09:00:00-07:00");
-
-      CreateFullDayEvent(service, "I am the name of this event", "Full", startDateTime);
-
-
-    // List the next 10 events from the primary calendar.
-    DateTime now = new DateTime(System.currentTimeMillis());
-    Events events = service.events().list("primary")
-        .setMaxResults(10)
-        .setTimeMin(now)
-        .setOrderBy("startTime")
-        .setSingleEvents(true)
-        .execute();
-    List<Event> items = events.getItems();
-    if (items.isEmpty()) {
-      System.out.println("No upcoming events found.");
-    } else {
-      System.out.println("Upcoming events");
-      for (Event event : items) {
-        DateTime start = event.getStart().getDateTime();
-        if (start == null) {
-          start = event.getStart().getDate();
-        }
-        System.out.printf("%s (%s)\n", event.getSummary(), start);
-      }
-    }
-  }
-}
