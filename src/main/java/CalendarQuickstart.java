@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ByteArrayInputStream;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -64,11 +65,33 @@ public class CalendarQuickstart {
    */
   private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
       throws IOException {
-    // Load client secrets.
-    InputStream in = CalendarQuickstart.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
+    // Load client secrets
+    String client_id = "";
+    String project_id = "";
+    String client_secret = "";
+    String redirect_uris = "";
+
+    String credentials = new String("{" +
+    "\"installed\": {" +
+        "\"client_id\": \"" + client_id + "\"," +
+        "\"project_id\": \"" + project_id + "\"," +
+        "\"auth_uri\": \"https://accounts.google.com/o/oauth2/auth\"," +
+        "\"token_uri\": \"https://oauth2.googleapis.com/token\"," +
+        "\"auth_provider_x509_cert_url\": \"https://www.googleapis.com/oauth2/v1/certs\"," +
+        "\"client_secret\": \"" + client_secret + "\"," +
+        "\"redirect_uris\": [" +
+            "\"" + redirect_uris + "\"" +
+        "]" +
+    "}");
+
+    InputStream in = new ByteArrayInputStream(credentials.getBytes());
+        //CalendarQuickstart.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
     if (in == null) {
       throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
     }
+    
+
+
     GoogleClientSecrets clientSecrets =
         GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
