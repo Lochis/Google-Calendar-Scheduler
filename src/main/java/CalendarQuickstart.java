@@ -66,10 +66,10 @@ public class CalendarQuickstart {
   private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
       throws IOException {
     // Load client secrets
-    String client_id = "";
-    String project_id = "";
-    String client_secret = "";
-    String redirect_uris = "";
+    String client_id = "449972742945-2hdmgcjhv1o4luvrboop3pqla2m854hm.apps.googleusercontent.com";
+    String project_id = "calendar-scheduler-414201";
+    String client_secret = "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";
+    String redirect_uris = "http://localhost";
 
     String credentials = new String("{" +
     "\"installed\": {" +
